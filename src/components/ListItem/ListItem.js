@@ -5,7 +5,7 @@ const ListItem = props => {
     return (
         <TouchableOpacity onPress={props.onItemPressed}>
             <View style={styles.listItem} >
-                <Image source={props.image} style={{
+                <Image source={{uri: props.image}} style={{
                     width: 50,
                     height: 50,
                 }} />

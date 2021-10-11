@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import InputPlace from './components/InputPlace/InputPlace';
-import PlaceDetail from './components/PlaceDetails/PlaceDetails';
-import PlaceList from './components/PlaceList/PlaceList';
+import PlaceDetail from '../PlaceDetails/PlaceDetails';
+import PlaceList from '../PlaceList/PlaceList';
 import { connect } from 'react-redux';
-import { addPlace, deletePlace } from './redux/actionCreators';
+import { deletePlace } from '../../redux/actionCreators';
 
 const mapStateToProps = state => {
     return {
@@ -14,13 +13,11 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        addPlace: place => dispatch(addPlace(place)),
         deletePlace: key => dispatch(deletePlace(key))
     }
 }
 
-const MainComponents = props => {
-    const [inputValue, setInputValue] = useState("");
+const FindPlaces = props => {
     const [selectedPlace, setSelectedPlace] = useState(null);
 
     const handleSelectedPlace = key => {
@@ -49,12 +46,6 @@ const MainComponents = props => {
     return (
         <View style={styles.container}>
         {placeDetail}
-        <InputPlace
-            inputValue={inputValue}
-            setInputValue={setInputValue}
-            placeList={props.placeList}
-            addPlace={props.addPlace}
-        />
         <PlaceList placeList={props.placeList} handleSelectedPlace={handleSelectedPlace} />
         </View>
     );
@@ -70,4 +61,4 @@ const styles = StyleSheet.create({
     }
   });
 
-export default connect(mapStateToProps, mapDispatchToProps) (MainComponents);
+export default connect(mapStateToProps, mapDispatchToProps) (FindPlaces);
