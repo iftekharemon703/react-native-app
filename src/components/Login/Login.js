@@ -1,6 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import backgroundImage from '../../images/background.jpg';
+import { tryAuth } from '../../redux/actionCreators';
+import { connect } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
+
+const mapStateToProps = state => {
+    return {
+        isAuth: state.isAuth
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        tryAuth: (email, password, mode) => dispatch(tryAuth(email, password, mode))
+    }
+}
 
 const Login = props => {
     const [authStates, setAuthStates] = useState({
@@ -11,6 +26,19 @@ const Login = props => {
             confirmPassword: "",
         }
     })
+
+    const isFocused = useIsFocused();
+
+    useEffect(() => {
+        setAuthStates({
+            ...authStates,
+            inputs: {
+                email: "",
+                password: "",
+                confirmPassword: "",
+            }
+        })
+    } , [isFocused])
 
     const switchViews = () => {
         setAuthStates({
@@ -33,30 +61,30 @@ const Login = props => {
             }
         })
     }
-
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     const handleAuth = () => {
         const email = authStates.inputs.email;
         const password = authStates.inputs.password;
         const confirmPassword = authStates.inputs.confirmPassword;
 
-        if(email !== "" && password !== ""){
-            if(re.test(email)){
-                if(authStates.mode == "login"){
-                    props.navigation.navigate("Home");
-                }else{
-                    if(password === confirmPassword){
-                        props.navigation.navigate("Home")
-                    }else{
-                        alert("Password field cannot match")
+        if (email !== "" && password !== "") {
+            if (re.test(email)) {
+                if (authStates.mode === "login") {
+                    props.tryAuth(email, password, "login");
+                } else {
+                    if (password === confirmPassword) {
+                        props.tryAuth(email, password, "signup");
+                    } else {
+                        alert("Password fields doesn't Match!");
                     }
                 }
-            }else{
-                alert("Invalid Email")
+            } else {
+                alert("Invalid Email!");
             }
-        }else{
-            alert("Input all the field")
+        } else {
+            alert("Input all the fields!")
         }
+
     }
 
     let confirmPassField = null;
@@ -70,14 +98,14 @@ const Login = props => {
             />
         );
     }
-    return ( 
+    return (
         <ImageBackground
             source={backgroundImage}
             style={{ width: "100%", flex: 1 }}
             blurRadius={5}>
             <View style={styles.loginView}>
                 <TouchableOpacity
-                    style={{ ...styles.btnContainer, backgroundColor: "#1167b1", width: "85%", paddingBottom: 5 }}
+                    style={{ ...styles.btnContainer, backgroundColor: "#192a56", width: "85%", paddingTop: 5, paddingBottom: 10 , borderRadius: 25}}
                     onPress={
                         () => switchViews()
                     }
@@ -97,9 +125,10 @@ const Login = props => {
                     onChangeText={value => updateInputs(value, "password")}
                 />
                 {confirmPassField}
-                <TouchableOpacity 
-                    style={styles.btnContainer} 
-                    onPress={() => handleAuth()} >
+                <TouchableOpacity style={styles.btnContainer}
+                    onPress={() => {
+                        handleAuth()
+                    }}>
                     <Text style={styles.btnStyle}>{authStates.mode === "login" ? "Login" : "Sign Up"}</Text>
                 </TouchableOpacity>
             </View >
@@ -107,6 +136,7 @@ const Login = props => {
 
     );
 }
+
 
 const styles = StyleSheet.create({
     loginView: {
@@ -119,17 +149,18 @@ const styles = StyleSheet.create({
         width: "85%",
         padding: 5,
         marginTop: 10,
-        backgroundColor: "#eee",
+        backgroundColor: "#ecf0f1",
         borderWidth: 1,
-        borderColor: "#009688",
-        borderRadius: 4
+        borderColor: "#2980b9",
+        borderRadius: 25,
+        paddingLeft: 20
     },
     btnContainer: {
         flexDirection: "row",
         width: 150,
-        paddingVertical: 5,
-        backgroundColor: "#009688",
-        borderRadius: 5,
+        paddingVertical: 10,
+        backgroundColor: "#2c3e50",
+        borderRadius: 25,
         marginTop: 10,
         justifyContent: "center",
         alignItems: "center"
@@ -142,4 +173,4 @@ const styles = StyleSheet.create({
 })
 
 
-export default Login;
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
